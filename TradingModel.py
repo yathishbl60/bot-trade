@@ -5,13 +5,14 @@ import json
 import plotly.graph_objs as go
 from plotly.offline import plot
 
-from pyti.smoothed_moving_average import smoothed_moving_average as sma
-from pyti.bollinger_bands import lower_bollinger_band as lbb
-
 from Binance import Binance
 
 class TradingModel:
 	
+	# We can now remove the code where we're computing the indicators from this class,
+	# As we will be computing them in the Strategies class (on a per-need basis)
+
+
 	def __init__(self, symbol, timeframe:str='4h'):
 		self.symbol = symbol
 		self.timeframe = timeframe
@@ -19,16 +20,9 @@ class TradingModel:
 		self.df = self.exchange.GetSymbolData(symbol, timeframe)
 		self.last_price = self.df['close'][len(self.df['close'])-1]
 
-		try:
-			self.df['fast_sma'] = sma(self.df['close'].tolist(), 10)
-			self.df['slow_sma'] = sma(self.df['close'].tolist(), 30)
-			self.df['low_boll'] = lbb(self.df['close'].tolist(), 14)
-		except Exception as e:
-			print("Exception raised when trying to compute indicators on "+self.symbol)
-			print(e)
-			return None
+	# We'll look directly in the dataframe to see what indicators we're plotting
 
-	def plotData(self, buy_signals = False, sell_signals = False, plot_title:str="", indicators=[]):
+	def plotData(self, buy_signals = False, sell_signals = False, plot_title:str=""):
 		df = self.df
 
 		# plot candlestick chart
@@ -42,7 +36,7 @@ class TradingModel:
 
 		data = [candle]
 
-		if indicators.__contains__('fast_sma'):
+		if df.__contains__('fast_sma'):
 			fsma = go.Scatter(
 				x = df['time'],
 				y = df['fast_sma'],
@@ -50,7 +44,7 @@ class TradingModel:
 				line = dict(color = ('rgba(102, 207, 255, 50)')))
 			data.append(fsma)
 
-		if indicators.__contains__('slow_sma'):
+		if df.__contains__('slow_sma'):
 			ssma = go.Scatter(
 				x = df['time'],
 				y = df['slow_sma'],
@@ -58,7 +52,7 @@ class TradingModel:
 				line = dict(color = ('rgba(255, 207, 102, 50)')))
 			data.append(ssma)
 
-		if indicators.__contains__('low_boll'):
+		if df.__contains__('low_boll'):
 			lowbb = go.Scatter(
 				x = df['time'],
 				y = df['low_boll'],
@@ -66,6 +60,46 @@ class TradingModel:
 				line = dict(color = ('rgba(255, 102, 207, 50)')))
 			data.append(lowbb)
 
+		# Now, Let's also plot the Ichimoku Indicators
+
+		if df.__contains__('tenkansen'):
+			trace = go.Scatter(
+				x = df['time'],
+				y = df['tenkansen'],
+				name = "Tenkansen",
+				line = dict(color = ('rgba(40, 40, 141, 100)')))
+			data.append(trace)
+		
+		if df.__contains__('kijunsen'):
+			trace = go.Scatter(
+				x = df['time'],
+				y = df['kijunsen'],
+				name = "Kijunsen",
+				line = dict(color = ('rgba(140, 40, 40, 100)')))
+			data.append(trace)
+
+		if df.__contains__('senkou_a'):
+			trace = go.Scatter(
+				x = df['time'],
+				y = df['senkou_a'],
+				name = "Senkou A",
+				line = dict(color = ('rgba(160, 240, 160, 100)')))
+			data.append(trace)
+	
+		# As you saw in the chart earlier, the portion between Senkou A and B
+		# is filled, either with red or with green. Here, We'll only be using red
+		# I haven't found a proper way to change the colors of the fill based on
+		# who is on top (Senkou A or B). If you have a way, please put it into the
+		# comments, or bettew yet, write it in the code on github (make a pull request)!!
+
+		if df.__contains__('senkou_b'):
+			trace = go.Scatter(
+				x = df['time'],
+				y = df['senkou_b'],
+				name = "Senkou B",
+				fill = "tonexty",
+				line = dict(color = ('rgba(240, 160, 160, 50)')))
+			data.append(trace)
 
 		if buy_signals:
 			buys = go.Scatter(
@@ -88,7 +122,18 @@ class TradingModel:
 			data.append(sells)
 
 		# style and display
-		layout = go.Layout(title=plot_title)
+		# let's customize our layout a little bit:
+		layout = go.Layout(
+			title=plot_title,
+			xaxis = {
+				"title" : self.symbol,
+				"rangeslider" : {"visible": False},
+				"type" : "date"
+			},
+			yaxis = {
+				"fixedrange" : False,
+			})
+			
 		fig = go.Figure(data = data, layout = layout)
 
 		plot(fig, filename='graphs/'+plot_title+'.html')
