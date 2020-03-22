@@ -127,6 +127,7 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
-graphs/
+graphs/*
 docker-images/*
-!docker-images/.keep
+
+!.gitkeep
