@@ -1,8 +1,7 @@
-from StrategyEvaluator import StrategyEvaluator
-from Strategies import Strategies
-
-from Binance import Binance
-from TradingModel import TradingModel
+from .StrategyEvaluator import StrategyEvaluator
+from .Strategies import Strategies
+from .Binance import Binance
+from .TradingModel import TradingModel
 
 import json
 
@@ -119,7 +118,7 @@ opening_text = "\nWelcome to Crypto Trading Bot. \n \
 	Press 'e' (ENTER) to execute the strategies on all coins \n \
 	Press 'q' (ENTER) to quit. "
 
-def Main():
+def main():
 
 	exchange = Binance()
 	symbols = exchange.GetTradingSymbols(quoteAssets=["ETH"])
@@ -143,6 +142,3 @@ def Main():
 		BacktestStrategies(symbols=symbols, interval='5m', plot=True, strategy_evaluators=strategy_evaluators)
 	if answer == 'q':
 		print("\nBYE!\n")
-
-if __name__ == '__main__':
-	Main()

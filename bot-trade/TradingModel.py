@@ -5,7 +5,7 @@ import json
 import plotly.graph_objs as go
 from plotly.offline import plot
 
-from Binance import Binance
+from .Binance import Binance
 
 class TradingModel:
 	
