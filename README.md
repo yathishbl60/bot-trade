@@ -16,3 +16,4 @@ python3 TradingBot.py
 - Whale alerts
 - Futures support
 - Logging and monitoring uptime
+- Envirnment setup - run docker with config
