@@ -4,5 +4,48 @@
 			"path": "."
 		}
 	],
-	"settings": {}
+	"settings": {},
+	"tasks": {
+		"tasks": [
+			{
+				"type": "docker-build",
+				"label": "docker-build",
+				"platform": "python",
+				"dockerBuild": {
+					"tag": "bottrade:latest",
+					"dockerfile": "${workspaceFolder}/Dockerfile",
+					"context": "${workspaceFolder}"
+				}
+			},
+			{
+				"type": "docker-run",
+				"label": "docker-run: debug",
+				"dependsOn": [
+					"docker-build"
+				],
+				"python": {
+					"file": "source/TradingBot.py"
+				}
+			}
+		]
+	},
+	"launch": {
+		"configurations": [
+			{
+				"name": "Docker: Python - General",
+				"type": "docker",
+				"request": "launch",
+				"preLaunchTask": "docker-run: debug",
+				"python": {
+					"pathMappings": [
+						{
+							"localRoot": "${workspaceFolder}",
+							"remoteRoot": "/app"
+						}
+					],
+					"projectType": "general"
+				}
+			}
+		]
+	}
 }

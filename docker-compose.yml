@@ -1,0 +1,8 @@
+version: '3.4'
+
+services:
+  bottrade:
+    image: bottrade
+    build:
+      context: .
+      dockerfile: Dockerfile
