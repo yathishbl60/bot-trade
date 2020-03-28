@@ -6,14 +6,14 @@ python3 TradingBot.py
 - Press 'q' (ENTER) to quit.
 
 # TODO
-- Profit/loss calulation
 - Adjust stop loss/limit
-- CLI interface
+- Profit/loss calulation
 - Volatality detection
-- Chose only high volume coins
+- Chose only high volume coins - initial step: implement with manual config
+- Logging and monitoring uptime
+- CLI interface
 - Bot for chat app (slack or telegram)
+- Futures support
+- Envirnment setup - run docker with config
 - Bitmex support
 - Whale alerts
-- Futures support
-- Logging and monitoring uptime
-- Envirnment setup - run docker with config
