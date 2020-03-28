@@ -1,6 +1,6 @@
-from .StrategyEvaluator import StrategyEvaluator
-from .Strategies import Strategies
-from .Binance import Binance
+from .backtesting.StrategyEvaluator import StrategyEvaluator
+from .stratergies.Strategies import Strategies
+from .exchanges.Binance import Binance
 from .TradingModel import TradingModel
 
 import json
@@ -20,9 +20,9 @@ incremental_profits = 1.005, incremental_stop_loss = 0.995)):
 	trade_value = options['starting_balance']
 	for symbol in symbols:
 		print(symbol)
-		model = TradingModel(symbol=symbol, timeframe=interval)
+		model = TradingModel(symbol=symbol, time_frame=interval)
 		for evaluator in strategy_evaluators:
-			resulting_balance = evaluator.backtest(
+			resulting_balance = evaluator.back_test(
 				model,
 				starting_balance=options['starting_balance'],
 				initial_profits = options['initial_profits'],
@@ -37,19 +37,19 @@ incremental_profits = 1.005, incremental_stop_loss = 0.995)):
 				+ ": resulting balance: " + str(round(resulting_balance, 2)))
 
 				if plot:
-					model.plotData(
+					model.plot_data(
 						buy_signals = evaluator.results[model.symbol]['buy_times'],
 						sell_signals = evaluator.results[model.symbol]['sell_times'],
 						plot_title = evaluator.strategy.__name__+" on "+model.symbol)
 					
 				evaluator.profits_list.append(resulting_balance - trade_value)
-				evaluator.updateResult(trade_value, resulting_balance)
+				evaluator.update_result(trade_value, resulting_balance)
 			
 			coins_tested = coins_tested + 1
 
 	for evaluator in strategy_evaluators:
 		print("")
-		evaluator.printResults()
+		evaluator.print_results()
 	
 
 # Now, We will write the function that checks the current market conditions 
@@ -70,7 +70,7 @@ options = dict(starting_balance=100, initial_profits = 1.01, initial_stop_loss =
 incremental_profits = 1.005, incremental_stop_loss = 0.995)):
 	for symbol in symbols:
 		print(symbol)
-		model = TradingModel(symbol=symbol, timeframe=interval)
+		model = TradingModel(symbol=symbol, time_frame=interval)
 		for evaluator in strategy_evaluators:
 			if evaluator.evaluate(model):
 				print("\n"+evaluator.strategy.__name__+" matched on "+symbol)
@@ -78,7 +78,7 @@ incremental_profits = 1.005, incremental_stop_loss = 0.995)):
 				answer = input()
 
 				if answer == 'b':
-					resulting_balance = evaluator.backtest(
+					resulting_balance = evaluator.back_test(
 						model,
 						starting_balance=options['starting_balance'],
 						initial_profits = options['initial_profits'],
@@ -86,7 +86,7 @@ incremental_profits = 1.005, incremental_stop_loss = 0.995)):
 						incremental_profits = options['incremental_profits'],
 						incremental_stop_loss = options['incremental_stop_loss'],
 					)
-					model.plotData(
+					model.plot_data(
 						buy_signals = evaluator.results[model.symbol]['buy_times'],
 						sell_signals = evaluator.results[model.symbol]['sell_times'],
 						plot_title=evaluator.strategy.__name__+" matched on "+symbol
@@ -103,7 +103,7 @@ incremental_profits = 1.005, incremental_stop_loss = 0.995)):
 					# However, if we received a symbol on XYZETH, and say 1 XYZ = 3 ETH, maybe we only want to buy 0.05 XYZ.
 					# Therfore, we need to specify the amount we need to buy in terms of QUOTE ASSET (ETH), not base asset.
 					# # We are changing the PlaceOrder function to reflect that. 
-					order_result = model.exchange.PlaceOrder(model.symbol, "BUY", "MARKET", quantity=0.02, test=False)
+					order_result = model.exchange.place_order(model.symbol, "BUY", "MARKET", quantity=0.02, test=False)
 					if "code" in order_result:
 						print("\nERROR.")
 						print(order_result)
@@ -121,7 +121,7 @@ opening_text = "\nWelcome to Crypto Trading Bot. \n \
 def main():
 
 	exchange = Binance()
-	symbols = exchange.GetTradingSymbols(quoteAssets=["ETH"])
+	symbols = exchange.get_trading_symbols(quote_assets=["ETH"])
 
 	strategy_evaluators = [
 		StrategyEvaluator(strategy_function=Strategies.bollStrategy),

@@ -1,5 +1,5 @@
 
-from .Indicators import Indicators
+from ..indicators.Indicators import Indicators
 
 class Strategies:
 
