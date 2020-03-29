@@ -6,10 +6,7 @@ from .exchanges.Binance import Binance
 
 class TradingModel:
 
-    # We can now remove the code where we're computing the indicators from this class,
-    # As we will be computing them in the Strategies class (on a per-sneed basis)
-
-    def __init__(self, symbol, time_frame: str = '4h'):
+    def __init__(self, symbol, time_frame: str):
         self.symbol = symbol
         self.time_frame = time_frame
         self.exchange = Binance()

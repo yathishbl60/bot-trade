@@ -6,11 +6,6 @@ import time
 import pandas as pd
 import hashlib
 
-# I will show you how exactly to get these API Keys
-# But first, let's update our function that gets the candlestick data 
-# to get more than just the limit of 1000 candles. It will be useful
-# in case we want to backtest our strategies over a longer period
-
 binance_keys = {
 	'api_key': "PLACE_API_KEY_HERE",
 	'secret_key': "PLACE_SECRET_KEY_HERE"

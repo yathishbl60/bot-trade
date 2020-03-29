@@ -1,11 +1,7 @@
-from .backtesting.StrategyEvaluator import StrategyEvaluator
-from .stratergies.Strategies import Strategies
-from .exchanges.Binance import Binance
 from .TradingModel import TradingModel
-
-import json
-
-from decimal import Decimal, getcontext
+from .backtesting.StrategyEvaluator import StrategyEvaluator
+from .exchanges.Binance import Binance
+from .stratergies.Strategies import Strategies
 
 
 # Now, We will put everything together. Continuing with our command line interface, we will allow ourselves
@@ -13,9 +9,8 @@ from decimal import Decimal, getcontext
 # any coins are eligible, we will plot & backtest that strategy on that particular coin, and if we are 
 # happy with the results, we can place an order. 
 
-# We will update this function a little bit, to make it more customizable
-def backtest_strategies(symbols=None, interval='4h', plot=False, strategy_evaluators=None,
-                        options=None):
+def back_test_strategies(symbols=None, interval='1h', plot=False, strategy_evaluators=None,
+                         options=None):
     if symbols is None:
         symbols = []
 
@@ -28,6 +23,7 @@ def backtest_strategies(symbols=None, interval='4h', plot=False, strategy_evalua
 
     coins_tested = 0
     trade_value = options['starting_balance']
+
     for symbol in symbols:
         print(symbol)
         model = TradingModel(symbol=symbol, time_frame=interval)
@@ -64,8 +60,6 @@ def backtest_strategies(symbols=None, interval='4h', plot=False, strategy_evalua
 
 # Now, We will write the function that checks the current market conditions 
 # & allows us to place orders if the conditions are good
-
-# But First, We need to define the messages that the user will see:
 
 strategy_matched_symbol = "\nStragey Matched Symbol! \
     \nType 'b' then ENTER to backtest the strategy on this symbol & see the plot \
@@ -133,7 +127,7 @@ def evaluate_strategies(symbols=None, strategy_evaluators=None, interval='1h',
                         print(order_result)
 
 
-# Now, we're almost ready to start the bot. Let's add our third strategy and some commands.
+# Now, we're almost ready to start the bot.
 
 opening_text = "\nWelcome to Crypto Trading Bot. \n \
     Press 'b' (ENTER) to backtest all strategies \n \
@@ -161,6 +155,6 @@ def main():
     if answer == 'e':
         evaluate_strategies(symbols=symbols, interval='5m', strategy_evaluators=strategy_evaluators)
     if answer == 'b':
-        backtest_strategies(symbols=symbols, interval='5m', plot=True, strategy_evaluators=strategy_evaluators)
+        back_test_strategies(symbols=symbols, interval='5m', plot=True, strategy_evaluators=strategy_evaluators)
     if answer == 'q':
         print("\nBYE!\n")
