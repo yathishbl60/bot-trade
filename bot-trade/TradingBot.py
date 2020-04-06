@@ -2,6 +2,7 @@ from .TradingModel import TradingModel
 from .backtesting.StrategyEvaluator import StrategyEvaluator
 from .exchanges.Binance import Binance
 from .stratergies.Strategies import Strategies
+from loguru import logger
 
 
 # Now, We will put everything together. Continuing with our command line interface, we will allow ourselves
@@ -25,7 +26,7 @@ def back_test_strategies(symbols=None, interval='1h', plot=False, strategy_evalu
     trade_value = options['starting_balance']
 
     for symbol in symbols:
-        print(symbol)
+        logger.debug('Back testing begin for {}'.format(symbol))
         model = TradingModel(symbol=symbol, time_frame=interval)
         for evaluator in strategy_evaluators:
             resulting_balance = evaluator.back_test(
@@ -38,10 +39,9 @@ def back_test_strategies(symbols=None, interval='1h', plot=False, strategy_evalu
             )
 
             if resulting_balance != trade_value:
-                print(evaluator.strategy.__name__
-                      + ": starting balance: " + str(trade_value)
-                      + ": resulting balance: " + str(round(resulting_balance, 2)))
-
+                logger.debug(evaluator.strategy.__name__
+                             + ": starting balance: " + str(trade_value)
+                             + ": resulting balance: " + str(round(resulting_balance, 2)))
                 if plot:
                     model.plot_data(
                         buy_signals=evaluator.results[model.symbol]['buy_times'],
@@ -83,12 +83,12 @@ def evaluate_strategies(symbols=None, strategy_evaluators=None, interval='1h',
                        incremental_profits=1.005, incremental_stop_loss=0.995)
 
     for symbol in symbols:
-        print(symbol)
+        logger.debug(symbol)
         model = TradingModel(symbol=symbol, time_frame=interval)
         for evaluator in strategy_evaluators:
             if evaluator.evaluate(model):
-                print("\n" + evaluator.strategy.__name__ + " matched on " + symbol)
-                print(strategy_matched_symbol)
+                logger.info("\n" + evaluator.strategy.__name__ + " matched on " + symbol)
+                logger.info(strategy_matched_symbol)
                 answer = input()
 
                 if answer == 'b':
@@ -105,11 +105,11 @@ def evaluate_strategies(symbols=None, strategy_evaluators=None, interval='1h',
                         sell_signals=evaluator.results[model.symbol]['sell_times'],
                         plot_title=evaluator.strategy.__name__ + " matched on " + symbol
                     )
-                    print(evaluator.results[model.symbol])
-                    print(ask_place_order)
+                    logger.info(evaluator.results[model.symbol])
+                    logger.info(ask_place_order)
                     answer = input()
                 if answer == 'p':
-                    print("\nPlacing Buy Order. ")
+                    logger.info("\nPlacing Buy Order. ")
 
                     # We need to update the PlaceOrder function - we don't know what symbol we will be buying
                     # beforehand, but let's say that we have received a symbol on coin ABCETH, where 1 ABC = 0.0034
@@ -120,11 +120,11 @@ def evaluate_strategies(symbols=None, strategy_evaluators=None, interval='1h',
 
                     order_result = model.exchange.place_order(model.symbol, "BUY", "MARKET", quantity=0.02, test=False)
                     if "code" in order_result:
-                        print("\nERROR.")
-                        print(order_result)
+                        logger.debug("\nERROR.")
+                        logger.debug(order_result)
                     else:
-                        print("\nSUCCESS.")
-                        print(order_result)
+                        logger.debug("\nSUCCESS.")
+                        logger.debug(order_result)
 
 
 # Now, we're almost ready to start the bot.
